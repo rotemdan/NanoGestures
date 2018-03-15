@@ -1,0 +1,35 @@
+{
+	"manifest_version": 2,
+	"name": "Nano Gestures",
+	"version": "0.1.0",
+	"description": "Adds four basic mouse gestures for browser navigation. Hold right mouse button + drag left or right to navigate backwards/forwards respectively, drag up to create new tab, down to reload current one.",
+	"icons": {},
+	"author": "Rotem Dan",
+	"homepage_url": "https://github.com/rotemdan/NanoGestures",
+	"background": {
+		"scripts": [
+			"browser-polyfill.js",
+			"background.js"
+		]
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"<all_urls>"
+			],
+			"js": [
+				"browser-polyfill.js",
+				"content.js"
+			],
+			"run_at": "document_start",
+			"all_frames": true,
+			"match_about_blank": true
+		}
+	],
+	"options_ui": {
+		"page": "options.html"
+	},
+	"permissions": [
+		"storage"
+	]
+}

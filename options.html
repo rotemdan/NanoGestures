@@ -1,0 +1,47 @@
+<!doctype html>
+<meta charset="utf-8" />
+<html lang="en">
+
+<head>
+	<title>Nano Gestures Options</title>
+	<style>
+		body,
+		input {
+			font-size: 16px
+		}
+</style>
+	<script src="browser-polyfill.js"></script>
+	<script src="options.js"></script>
+</head>
+
+<body>
+	<fieldset>
+		<legend>Enable/disable individual gestures</legend>
+		<div>
+			<input id="leftEnabled" type="checkbox" />
+			<label for="leftEnabled">RMouse + drag left to navigate backwards</label>
+		</div>
+		<div>
+			<input id="rightEnabled" type="checkbox" />
+			<label for="rightEnabled">RMouse + drag right to navigate forwards</label>
+		</div>
+		<div>
+			<input id="upEnabled" type="checkbox" />
+			<label for="upEnabled">RMouse + drag up to create new tab</label>
+		</div>
+		<div>
+			<input id="downEnabled" type="checkbox" />
+			<label for="downEnabled">RMouse + drag down to reload current page</label>
+		</div>
+	</fieldset>
+	<fieldset>
+		<legend>Gesture detection options</legend>
+		<div>
+			<label for="minDelta">Cursor delta threshold:</label>
+			<input id="minDelta" type="range" min="1" max="40" step="1" />
+			<label id="minDeltaDisplay" for="minDelta"></label>
+		</div>
+	</fieldset>
+</body>
+
+</html>
