@@ -1,4 +1,4 @@
-const debugModeEnabled = true
+const debugModeEnabled = false
 function log(...args) {
 	if (debugModeEnabled) {
 		console.log("[NanoGestures]", ...args)
