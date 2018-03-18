@@ -1,8 +1,8 @@
 {
 	"manifest_version": 2,
 	"name": "Nano Gestures",
-	"version": "0.1.1",
-	"description": "Adds four basic mouse gestures for browser navigation. Hold right mouse button + drag left or right to navigate backwards/forwards respectively, drag up to create new tab, down to reload current one.",
+	"version": "0.1.3",
+	"description": "Adds four basic mouse gestures for browser navigation.",
 	"icons": {
 		"48": "icons/icon-48.png",
 		"96": "icons/icon-96.png"

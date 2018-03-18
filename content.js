@@ -30,7 +30,7 @@ function onMouseDown(event) {
 }
 
 // Event handler: Mouse button released
-function onMouseUp(event) {
+async function onMouseUp(event) {
 	// If right mouse button released
 	if (event.button == 2) {
 		rightMouseUpTriggeredOnce = true;
@@ -68,9 +68,13 @@ function onMouseUp(event) {
 				}
 			} else {
 				if (options.upEnabled && deltaY < minDelta * -1) {
-					browser.runtime.sendMessage({ operation: 'createNewTab' });
+					await browser.runtime.sendMessage({ operation: 'createNewTab' });
 				} else if (options.downEnabled && deltaY >= minDelta) {
-					window.location.reload();
+					if (window.self === window.top) {
+						window.location.reload();
+					} else {
+						await browser.runtime.sendMessage({ operation: 'reloadCurrentTab' });
+					}
 				}
 			}
 		} else {

@@ -8,7 +8,13 @@ async function onInstalled(details) {
 async function onMessage(request, sender, sendResponse) {
 	switch (request.operation) {
 		case "createNewTab": {
-			browser.tabs.create({});
+			await browser.tabs.create({});
+			break;
+		}
+
+		case "reloadCurrentTab": {
+			await browser.tabs.reload();
+			break;
 		}
 	}
 }
