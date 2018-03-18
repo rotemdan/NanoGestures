@@ -33,6 +33,7 @@
 		"page": "options.html"
 	},
 	"permissions": [
-		"storage"
+		"storage",
+		"tabs"
 	]
 }
