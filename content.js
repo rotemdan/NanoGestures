@@ -11,9 +11,6 @@ function onMouseDown(event) {
 	if (event.button == 2) {
 		log("onMouseDown: right");
 
-		//event.preventDefault();
-		//event.stopImmediatePropagation();
-
 		// Store start coordinates
 		startX = event.pageX;
 		startY = event.pageY;
@@ -114,7 +111,7 @@ function onContextMenu(event) {
 	if (suppressContextMenu) {
 		log("Context menu suppressed")
 		event.preventDefault();
-
+		event.stopImmediatePropagation();
 		suppressContextMenu = false;
 	}
 }
@@ -132,13 +129,13 @@ function onPageHide(event) {
 async function init() {
 	options = await extensionStorage.get(["leftEnabled", "rightEnabled", "upEnabled", "downEnabled", "minDelta"]);
 
-	window.addEventListener('mousedown', onMouseDown, false);
-	window.addEventListener('mouseup', onMouseUp, false);
-	window.addEventListener('click', onClick, false);
-	window.addEventListener("keydown", onKeyDown, false);
-	window.addEventListener('contextmenu', onContextMenu, false);
-	window.addEventListener('pageshow', onPageShow, false);
-	window.addEventListener('pagehide', onPageHide, false);
+	window.addEventListener('mousedown', onMouseDown, true);
+	window.addEventListener('mouseup', onMouseUp, true);
+	window.addEventListener('click', onClick, true);
+	window.addEventListener("keydown", onKeyDown, true);
+	window.addEventListener('contextmenu', onContextMenu, true);
+	window.addEventListener('pageshow', onPageShow, true);
+	window.addEventListener('pagehide', onPageHide, true);
 }
 
 init();
