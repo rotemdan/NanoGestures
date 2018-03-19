@@ -1,7 +1,5 @@
-const extensionStorage = browser.storage.sync;
-
 async function onInstalled(details) {
-	let { leftEnabled = true, rightEnabled = true, upEnabled = true, downEnabled = true, minDelta = 4 } = await extensionStorage.get(["leftEnabled", "rightEnabled", "upEnabled", "downEnabled", "minDelta"]);
+	const { leftEnabled = true, rightEnabled = true, upEnabled = true, downEnabled = true, minDelta = 4 } = await extensionStorage.get(["leftEnabled", "rightEnabled", "upEnabled", "downEnabled", "minDelta"]);
 	await extensionStorage.set({ leftEnabled, rightEnabled, upEnabled, downEnabled, minDelta });
 }
 

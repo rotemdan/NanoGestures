@@ -1,5 +1,3 @@
-const extensionStorage = browser.storage.sync;
-
 async function init() {
 	const initialOptions = await extensionStorage.get(["leftEnabled", "rightEnabled", "upEnabled", "downEnabled", "minDelta"]);
 
@@ -42,4 +40,5 @@ async function init() {
 	minDeltaInput.oninput = onMinDeltaInputChanged;
 }
 
-document.addEventListener('DOMContentLoaded', init, false);
+window.onload = init;
+

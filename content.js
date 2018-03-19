@@ -1,12 +1,3 @@
-const debugModeEnabled = false
-function log(...args) {
-	if (debugModeEnabled) {
-		console.log("[NanoGestures]", ...args)
-	}
-}
-
-const extensionStorage = browser.storage.sync;
-
 let options;
 let startX = -1; // Gesture start X coordinate
 let startY = -1; // Gesture start Y coordinate
