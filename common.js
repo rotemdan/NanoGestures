@@ -1,4 +1,4 @@
-const debugModeEnabled = false;
+const debugModeEnabled = true;
 const extensionManifest = browser.runtime.getManifest();
 
 function log(...args) {

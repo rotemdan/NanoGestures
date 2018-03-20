@@ -1,34 +1,44 @@
 let options;
-let startX = -1; // Gesture start X coordinate
-let startY = -1; // Gesture start Y coordinate
 
-let suppressContextMenu = false; // Suppress context menu after gesture
-let rightMouseUpTriggeredOnce = false;
+init();
 
-// Event handler: Mouse button pressed
-function onMouseDown(event) {
-	// If right mouse button pressed
-	if (event.button == 2) {
-		log("onMouseDown: right");
+async function init() {
+	options = await extensionStorage.get(["leftEnabled", "rightEnabled", "upEnabled", "downEnabled", "minDelta"]);
 
-		// Store start coordinates
-		startX = event.pageX;
-		startY = event.pageY;
-	}
+	window.addEventListener('mousedown', onMouseDown, true);
+	window.addEventListener('pageshow', onPageShow, true);
+	window.addEventListener('pagehide', onPageHide, true);
 }
 
-// Event handler: Mouse button released
-async function onMouseUp(event) {
-	// If right mouse button released
-	if (event.button == 2) {
-		rightMouseUpTriggeredOnce = true;
+// Event handler: Mouse button pressed
+function onMouseDown(mouseDownEvent) {
+	if (mouseDownEvent.button != 2) {
+		return;
+	}
 
-		log("onMouseUp: right");
+	log("Right mouse down event triggered");
 
-		if (startX == -1 || startY == -1) {
-			suppressContextMenu = true;
+	const startX = mouseDownEvent.pageX; // Gesture start X coordinate
+	const startY = mouseDownEvent.pageY; // Gesture start Y coordinate
+
+	window.addEventListener('mouseup', onMouseUp, true);
+	window.addEventListener('contextmenu', onContextMenu, true);
+	window.addEventListener('click', onClick, true);
+
+	let rightMouseUpTriggered = false;
+	let contextMenuTriggered = false;
+	let contextMenuEventObject = undefined;
+	let gestureDetected = false;
+
+	async function onMouseUp(event) {
+		if (event.button != 2) {
 			return;
 		}
+
+		window.removeEventListener('mouseup', onMouseUp, true);
+		log("Right mouse up event triggered.");
+		const contextMenuTriggeredBeforeMouseUp = contextMenuTriggered;
+		rightMouseUpTriggered = true;
 
 		// Calculate distance of movement
 		const deltaX = event.pageX - startX;
@@ -37,27 +47,33 @@ async function onMouseUp(event) {
 		const deltaY = event.pageY - startY;
 		const absDeltaY = Math.abs(deltaY);
 
-		const minDelta = options.minDelta;
+		log(`Delta X: ${deltaX}, Delta Y: ${deltaY}`)
 
-		// Determine type of gesture considering minimum distance
-		if (absDeltaX >= minDelta || absDeltaY >= minDelta) {
-			suppressContextMenu = true;
+		const minDelta = options.minDelta;
+		gestureDetected = absDeltaX >= minDelta || absDeltaY >= minDelta;
+
+		// If a gesture was detected
+		if (gestureDetected) {
 			event.preventDefault();
 			event.stopImmediatePropagation();
 
+			// Determine type of gesture considering minimum distance
 			const deltaYToXRatio = absDeltaY / absDeltaX;
-			log("deltaYToXRatio:", deltaYToXRatio);
 
 			if (deltaYToXRatio <= 1) {
 				if (options.leftEnabled && deltaX < minDelta * -1) {
+					log('Left gesture detected')
 					window.history.back();
 				} else if (options.rightEnabled && deltaX >= minDelta) {
+					log('Right gesture detected')
 					window.history.forward();
 				}
 			} else {
 				if (options.upEnabled && deltaY < minDelta * -1) {
+					log('Up gesture detected')
 					await browser.runtime.sendMessage({ operation: 'createNewTab' });
 				} else if (options.downEnabled && deltaY >= minDelta) {
+					log('Down gesture detected')
 					if (window.self === window.top) {
 						window.location.reload();
 					} else {
@@ -65,77 +81,58 @@ async function onMouseUp(event) {
 					}
 				}
 			}
-		} else {
-			suppressContextMenu = false;
+		} else if (contextMenuTriggeredBeforeMouseUp) {
+			log('Console menu was suppressed as it triggered before mouseUp but eventually no gesture was detected')
+			/*
+			log(contextMenuEventObject);
+			const simulatedContextMenuEvent = new MouseEvent('contextmenu', contextMenuEventObject);
+			log(simulatedContextMenuEvent);
+			contextMenuEventObject.dispatchEvent(simulatedContextMenuEvent);
+			*/
+		}
+	}
+
+	// Event handler: Context menu
+	function onContextMenu(event) {
+		window.removeEventListener('contextmenu', onContextMenu, true);
+		contextMenuTriggered = true;
+		contextMenuEventObject = event;
+
+		log("Context menu event triggered.")
+
+		if (!rightMouseUpTriggered) {
+			log("Context menu supressed as mouse up event has not yet fired");
+			event.preventDefault();
+			event.stopImmediatePropagation();
+		} else if (gestureDetected) {
+			log("Context menu supressed as a gesture has been detected");
+			event.preventDefault();
+			event.stopImmediatePropagation();
+		}
+	}
+
+	// Event handler: Mouse button pressed
+	function onClick(event) {
+		if (event.button != 2) {
+			return
 		}
 
-		startX = -1;
-		startY = -1;
-	}
-}
+		window.removeEventListener('click', onClick, true);
 
-// Event handler: Mouse button pressed
-function onClick(event) {
-	if (event.button == 2) {
-		log("rightClick");
+		log("Right click event triggered");
 
-		if (suppressContextMenu) {
+		if (gestureDetected) {
+			log("Right click suppreseed as a gesture has been detected");
 			event.preventDefault();
 			event.stopImmediatePropagation();
 		}
 	}
 }
 
-let lastKeyPressed = -1;
-
-function onKeyDown(event) {
-	//log("onKeyDown");
-	lastKeyPressed = event.keyCode;
-}
-
-// Event handler: Context menu
-function onContextMenu(event) {
-	log("onContextMenu. suppressContextMenu:", suppressContextMenu, ", rightMouseUpTriggeredOnce:", rightMouseUpTriggeredOnce);
-
-	if (lastKeyPressed === 93) { // If the 'menu' key was pressed, don't suppress
-		lastKeyPressed = -1;
-		return;
-	}
-
-	if (!rightMouseUpTriggeredOnce) { // Catch orphan contextmenu events
-		log("Context menu will be suppressed due to contextmenu event triggered without at least one right mouseUp")
-		suppressContextMenu = true;
-	}
-
-	// Valid gesture detected: Suppress context menu
-	if (suppressContextMenu) {
-		log("Context menu suppressed")
-		event.preventDefault();
-		event.stopImmediatePropagation();
-		suppressContextMenu = false;
-	}
-}
-
 function onPageShow(event) {
 	log("onPageShow");
-	rightMouseUpTriggeredOnce = false;
 }
 
 function onPageHide(event) {
 	log("onPageHide");
-	rightMouseUpTriggeredOnce = false;
 }
-
-async function init() {
-	options = await extensionStorage.get(["leftEnabled", "rightEnabled", "upEnabled", "downEnabled", "minDelta"]);
-
-	window.addEventListener('mousedown', onMouseDown, true);
-	window.addEventListener('mouseup', onMouseUp, true);
-	window.addEventListener('click', onClick, true);
-	window.addEventListener("keydown", onKeyDown, true);
-	window.addEventListener('contextmenu', onContextMenu, true);
-	window.addEventListener('pageshow', onPageShow, true);
-	window.addEventListener('pagehide', onPageHide, true);
-}
-
-init();
