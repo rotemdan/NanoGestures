@@ -82,7 +82,7 @@ function onMouseDown(mouseDownEvent) {
 				}
 			}
 		} else if (contextMenuTriggeredBeforeMouseUp) {
-			log('Console menu was suppressed as it triggered before mouseUp but eventually no gesture was detected')
+			log('Context menu was suppressed as it triggered before mouseUp but eventually no gesture was detected')
 			/*
 			log(contextMenuEventObject);
 			const simulatedContextMenuEvent = new MouseEvent('contextmenu', contextMenuEventObject);
