@@ -63,7 +63,7 @@ function onMouseDown(mouseDownEvent) {
 
 		// If a gesture was detected
 		if (gestureDetected) {
-			// Suppress all further event handlers and default behaviors for the mousedown event
+			// Suppress all further event handlers and default behaviors for the mouseup event
 			event.preventDefault();
 			event.stopImmediatePropagation();
 
@@ -136,7 +136,7 @@ function onMouseDown(mouseDownEvent) {
 		log("Right click event triggered");
 
 		if (gestureDetected) {
-			log("Right click suppressed as a gesture has been detected");
+			log("Right click event suppressed as a gesture has been detected");
 			event.preventDefault();
 			event.stopImmediatePropagation();
 		}
