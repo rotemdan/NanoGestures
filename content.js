@@ -63,7 +63,7 @@ function onMouseDown(mouseDownEvent) {
 
 		// If a gesture was detected
 		if (gestureDetected) {
-			// Suppress all further events and default behaviors for the mousedown event
+			// Suppress all further event handlers and default behaviors for the mousedown event
 			event.preventDefault();
 			event.stopImmediatePropagation();
 
@@ -92,8 +92,9 @@ function onMouseDown(mouseDownEvent) {
 				}
 			}
 		} else if (contextMenuTriggeredBeforeMouseUp) {
-			// This scenario might happen in macOS/Linux, in which by defualt contextmenu event
+			// This scenario might happen in macOS/Linux, in which by default contextmenu event
 			// is triggered before the mouseup event.
+			// (setting contextMenuShowEvent to 'mouseup' should avoid it)
 			log('Context menu was suppressed as it triggered before mouseUp but eventually no gesture was detected')
 		}
 
