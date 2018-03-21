@@ -3,17 +3,21 @@ let options;
 init();
 
 async function init() {
+	// Get options
 	options = await extensionStorage.get(["leftEnabled", "rightEnabled", "upEnabled", "downEnabled", "minDelta"]);
 
+	// Add mousedown event handler
 	window.addEventListener('mousedown', onMouseDown, true);
 
+	// Add auxilary handlers to detect orphan context menu events
+	// (context menu event that appears outside of a right click event sequence)
 	window.addEventListener('keydown', onKeyDown, true);
 	window.addEventListener('contextmenu', detectOrphanContextMenu, true);
 }
 
 let withinARightClickSequence = false;
 
-// Event handler: Mouse button pressed
+// Event handler: mouse pressed down
 function onMouseDown(mouseDownEvent) {
 	if (mouseDownEvent.button != 2) {
 		return;
@@ -37,13 +41,14 @@ function onMouseDown(mouseDownEvent) {
 		if (event.button != 2) {
 			return;
 		}
+
 		log("Right mouse up event triggered.");
 		window.removeEventListener('mouseup', onMouseUp, true);
 
 		const contextMenuTriggeredBeforeMouseUp = contextMenuTriggered;
 		rightMouseUpTriggered = true;
 
-		// Calculate distance of movement
+		// Calculate distance of cursor movement since the mousedown event
 		const deltaX = event.pageX - startX;
 		const absDeltaX = Math.abs(deltaX);
 
@@ -52,15 +57,17 @@ function onMouseDown(mouseDownEvent) {
 
 		log(`Delta X: ${deltaX}, Delta Y: ${deltaY}`)
 
+		// Determine if the movement was large enough to be identified as a gesture
 		const minDelta = options.minDelta;
 		gestureDetected = absDeltaX >= minDelta || absDeltaY >= minDelta;
 
 		// If a gesture was detected
 		if (gestureDetected) {
+			// Suppress all further events and default behaviors for the mousedown event
 			event.preventDefault();
 			event.stopImmediatePropagation();
 
-			// Determine type of gesture considering minimum distance
+			// Determine gesture type and handle it
 			const deltaYToXRatio = absDeltaY / absDeltaX;
 
 			if (deltaYToXRatio <= 1) {
@@ -85,6 +92,8 @@ function onMouseDown(mouseDownEvent) {
 				}
 			}
 		} else if (contextMenuTriggeredBeforeMouseUp) {
+			// This scenario might happen in macOS/Linux, in which by defualt contextmenu event
+			// is triggered before the mouseup event.
 			log('Context menu was suppressed as it triggered before mouseUp but eventually no gesture was detected')
 		}
 
@@ -93,7 +102,7 @@ function onMouseDown(mouseDownEvent) {
 		}
 	}
 
-	// Event handler: Context menu
+	// Event handler: context menu
 	function onContextMenu(event) {
 		window.removeEventListener('contextmenu', onContextMenu, true);
 		contextMenuTriggered = true;
@@ -142,7 +151,13 @@ function onKeyDown(event) {
 // Event handler to detect context menu not originating from a right click sequence
 // nor a relevant key press
 function detectOrphanContextMenu(event) {
-	if (!withinARightClickSequence && lastKeyPressed != 93) {
+	if (!withinARightClickSequence) {
+		if (lastKeyPressed == 93) {
+			// The menu key was last pressed, so don't suppress the context menu
+			lastKeyPressed = -1;
+			return;
+		}
+
 		log("Orphan context menu event suppressed");
 		event.preventDefault();
 		event.stopImmediatePropagation();
