@@ -199,34 +199,50 @@ async function handleGesture(gesture) {
 	switch (gesture) {
 		case "left":
 			if (ctrlKeyPressed) {
-				await executeAction(options.ctrlLeftAction);
+				if (options.ctrlLeftEnabled) {
+					await executeAction(options.ctrlLeftAction);
+				}
 			} else {
-				await executeAction(options.leftAction);
+				if (options.leftEnabled) {
+					await executeAction(options.leftAction);
+				}
 			}
 			break;
 
 		case "right":
 			if (ctrlKeyPressed) {
-				await executeAction(options.ctrlRightAction);
+				if (options.ctrlRightEnabled) {
+					await executeAction(options.ctrlRightAction);
+				}
 			} else {
-				await executeAction(options.rightAction);
+				if (options.rightEnabled) {
+					await executeAction(options.rightAction);
+				}
 			}
 
 			break;
 
 		case "up":
 			if (ctrlKeyPressed) {
-				await executeAction(options.ctrlUpAction);
+				if (options.ctrlUpEnabled) {
+					await executeAction(options.ctrlUpAction);
+				}
 			} else {
-				await executeAction(options.upAction);
+				if (options.upEnabled) {
+					await executeAction(options.upAction);
+				}
 			}
 			break;
 
 		case "down":
 			if (ctrlKeyPressed) {
-				await executeAction(options.ctrlDownAction);
+				if (options.ctrlDownEnabled) {
+					await executeAction(options.ctrlDownAction);
+				}
 			} else {
-				await executeAction(options.downAction);
+				if (options.downEnabled) {
+					await executeAction(options.downAction);
+				}
 			}
 			break;
 	}
