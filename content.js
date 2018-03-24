@@ -4,15 +4,35 @@ init();
 
 async function init() {
 	// Get options
-	options = await extensionStorage.get(["leftEnabled", "rightEnabled", "upEnabled", "downEnabled", "minDelta"]);
+	// options = await getOptions();
+	// (faster method -- assumes options are initialized when the extension starts):
+	options = (await extensionStorage.get('options')).options;
+
+	if (!options) {
+		log('No extension options found. Aborting');
+		return;
+	}
+
+	// Listen to option updates
+	browser.runtime.onMessage.addListener((message, sender) => {
+		if (message.type = 'optionsUpdated') {
+			options = message.data;
+		}
+	});
 
 	// Add mousedown event handler
 	window.addEventListener('mousedown', onMouseDown, true);
 
-	// Add auxilary handlers to detect orphan context menu events
+	// Add auxilary handler to detect orphan context menu events
 	// (context menu event that appears outside of a right click event sequence)
-	window.addEventListener('keydown', onKeyDown, true);
 	window.addEventListener('contextmenu', detectOrphanContextMenu, true);
+
+	// Add handler to track modifier key states and menu key presses
+	window.addEventListener('keydown', onKeyDown, true);
+	window.addEventListener('keyup', onKeyUp, true);
+
+	// Add handler to reset modifier key states when window is focused
+	window.addEventListener("focus", onWindowFocused, true);
 }
 
 let withinARightClickSequence = false;
@@ -72,23 +92,15 @@ function onMouseDown(mouseDownEvent) {
 
 			if (deltaYToXRatio <= 1) {
 				if (options.leftEnabled && deltaX < minDelta * -1) {
-					log('Left gesture detected')
-					window.history.back();
+					await handleGesture('left');
 				} else if (options.rightEnabled && deltaX >= minDelta) {
-					log('Right gesture detected')
-					window.history.forward();
+					await handleGesture('right');
 				}
 			} else {
 				if (options.upEnabled && deltaY < minDelta * -1) {
-					log('Up gesture detected')
-					await browser.runtime.sendMessage({ operation: 'createNewTab' });
+					await handleGesture('up');
 				} else if (options.downEnabled && deltaY >= minDelta) {
-					log('Down gesture detected')
-					if (window.self === window.top) {
-						window.location.reload();
-					} else {
-						await browser.runtime.sendMessage({ operation: 'reloadCurrentTab' });
-					}
+					await handleGesture('down');
 				}
 			}
 		} else if (contextMenuTriggeredBeforeMouseUp) {
@@ -144,9 +156,27 @@ function onMouseDown(mouseDownEvent) {
 }
 
 let lastKeyPressed = -1;
+let ctrlKeyPressed = false;
 
 function onKeyDown(event) {
 	lastKeyPressed = event.keyCode;
+
+	if (event.key == "Control") {
+		ctrlKeyPressed = true;
+	}
+}
+
+function onKeyUp(event) {
+	if (event.key == "Control") {
+		ctrlKeyPressed = false;
+	}
+}
+
+// Ensure that if the Ctrl key was release outside of any tracked pages, its state would
+// default to off when focus returns. If it is still pressed when focus returned it should yield
+// continuous keyup events.
+function onWindowFocused(event) {
+	ctrlKeyPressed = false
 }
 
 // Event handler to detect context menu not originating from a right click sequence
@@ -162,5 +192,90 @@ function detectOrphanContextMenu(event) {
 		log("Orphan context menu event suppressed");
 		event.preventDefault();
 		event.stopImmediatePropagation();
+	}
+}
+
+async function handleGesture(gesture) {
+	switch (gesture) {
+		case "left":
+			if (ctrlKeyPressed) {
+				await executeAction(options.ctrlLeftAction);
+			} else {
+				await executeAction(options.leftAction);
+			}
+			break;
+
+		case "right":
+			if (ctrlKeyPressed) {
+				await executeAction(options.ctrlRightAction);
+			} else {
+				await executeAction(options.rightAction);
+			}
+
+			break;
+
+		case "up":
+			if (ctrlKeyPressed) {
+				await executeAction(options.ctrlUpAction);
+			} else {
+				await executeAction(options.upAction);
+			}
+			break;
+
+		case "down":
+			if (ctrlKeyPressed) {
+				await executeAction(options.ctrlDownAction);
+			} else {
+				await executeAction(options.downAction);
+			}
+			break;
+	}
+}
+
+async function executeAction(action) {
+	switch (action) {
+		case "navigateBack":
+			window.history.back();
+			break;
+
+		case "navigateForward":
+			window.history.forward();
+			break;
+
+		case "reload":
+			if (window.self === window.top) {
+				window.location.reload();
+			} else {
+				await sendRequest('reloadCurrentTab');
+			}
+			break;
+
+		case "closeCurrentTab":
+			await sendRequest('closeCurrentTab');
+			break;
+
+		case "createNewTab":
+			await sendRequest('createNewTab');
+			break;
+
+		case "activateLeftTab":
+			await sendRequest('activateLeftTab', { skipTabsWithSpecialPages: false });
+			break;
+
+		case "activateLeftTabSkipSpecial":
+			await sendRequest('activateLeftTab', { skipTabsWithSpecialPages: true });
+			break;
+
+		case "activateRightTab":
+			await sendRequest('activateRightTab', { skipTabsWithSpecialPages: false });
+			break;
+
+		case "activateRightTabSkipSpecial":
+			await sendRequest('activateRightTab', { skipTabsWithSpecialPages: true });
+			break;
+
+		case "undoCloseTab":
+			await sendRequest('undoCloseTab');
+			break;
 	}
 }

@@ -5,8 +5,13 @@
 	<meta charset="utf-8" />
 	<title>Nano Gestures Options</title>
 	<style>
-		body,
-		input {
+		body {
+			width: 600px;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		body, input, select, option {
 			font-size: 16px
 		}
 	</style>
@@ -17,30 +22,66 @@
 
 <body>
 	<fieldset>
-		<legend>Enable/disable individual gestures</legend>
+		<legend>Customize gestures</legend>
 		<div>
 			<input id="leftEnabled" type="checkbox" />
-			<label for="leftEnabled">RMouse + drag left to navigate backwards</label>
+			<label for="leftEnabled">
+				RMouse + drag left to <select id="leftAction" class="action-selection"></select>
+			</label>
 		</div>
 		<div>
 			<input id="rightEnabled" type="checkbox" />
-			<label for="rightEnabled">RMouse + drag right to navigate forwards</label>
+			<label for="rightEnabled">
+				RMouse + drag right to <select id="rightAction" class="action-selection"></select>
+			</label>
 		</div>
 		<div>
 			<input id="upEnabled" type="checkbox" />
-			<label for="upEnabled">RMouse + drag up to create new tab</label>
+			<label for="upEnabled">
+				RMouse + drag up to <select id="upAction" class="action-selection"></select>
+			</label>
 		</div>
 		<div>
 			<input id="downEnabled" type="checkbox" />
-			<label for="downEnabled">RMouse + drag down to reload current page</label>
+			<label for="downEnabled">
+				RMouse + drag down to <select id="downAction" class="action-selection"></select>
+			</label>
 		</div>
 	</fieldset>
 	<fieldset>
+		<legend>Customize key modified gestures</legend>
+		<div>
+			<input id="ctrlLeftEnabled" type="checkbox" />
+			<label for="ctrlLeftEnabled">
+				Ctrl + RMouse + drag left to <select id="ctrlLeftAction" class="action-selection"></select>
+			</label>
+		</div>
+		<div>
+			<input id="ctrlRightEnabled" type="checkbox" />
+			<label for="ctrlRightEnabled">
+				Ctrl + RMouse + drag right to <select id="ctrlRightAction" class="action-selection"></select>
+			</label>
+		</div>
+		<div>
+			<input id="ctrlUpEnabled" type="checkbox" />
+			<label for="ctrlUpEnabled">
+				Ctrl + RMouse + drag up to <select id="ctrlUpAction" class="action-selection"></select>
+			</label>
+		</div>
+		<div>
+			<input id="ctrlDownEnabled" type="checkbox" />
+			<label for="ctrlDownEnabled">
+				Ctrl + RMouse + drag down to <select id="ctrlDownAction" class="action-selection"></select>
+			</label>
+		</div>
+	</fieldset>
+
+	<fieldset>
 		<legend>Gesture detection options</legend>
 		<div>
-			<label for="minDelta">Cursor delta threshold:</label>
+			<label for="minDelta">Minimal delta:</label>
 			<input id="minDelta" type="range" min="1" max="40" step="1" />
-			<label id="minDeltaDisplay" for="minDelta"></label>
+			<label for="minDelta" id="minDelta-display-value"></label>
 		</div>
 	</fieldset>
 </body>

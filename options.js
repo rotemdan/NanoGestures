@@ -1,44 +1,55 @@
+document.addEventListener("DOMContentLoaded", init);
+
 async function init() {
-	const initialOptions = await extensionStorage.get(["leftEnabled", "rightEnabled", "upEnabled", "downEnabled", "minDelta"]);
+	const options = await getOptions();
 
-	const leftEnabledCheckbox = document.getElementById("leftEnabled");
-	const rightEnabledCheckbox = document.getElementById("rightEnabled");
-	const upEnabledCheckbox = document.getElementById("upEnabled");
-	const downEnabledCheckbox = document.getElementById("downEnabled");
-	const minDeltaInput = document.getElementById("minDelta");
-	const minDeltaDisplay = document.getElementById("minDeltaDisplay");
-
-	leftEnabledCheckbox.checked = initialOptions.leftEnabled;
-	rightEnabledCheckbox.checked = initialOptions.rightEnabled;
-	upEnabledCheckbox.checked = initialOptions.upEnabled;
-	downEnabledCheckbox.checked = initialOptions.downEnabled;
-	minDeltaInput.valueAsNumber = initialOptions.minDelta;
-	minDeltaDisplay.textContent = minDeltaInput.value + "px";
-
-	leftEnabledCheckbox.onchange = async function (event) {
-		await extensionStorage.set({ "leftEnabled": event.target.checked });
+	for (const actionSelectionElement of document.querySelectorAll('.action-selection')) {
+		actionSelectionElement.innerHTML = `
+			<option value="none">do nothing</option>
+			<option value="navigateBack">navigate back</option>
+			<option value="navigateForward">navigate forward</option>
+			<option value="reload">reload current page</option>
+			<option value="closeCurrentTab">close current tab</option>
+			<option value="createNewTab">create new tab</option>
+			<option value="activateLeftTab">switch to left tab</option>
+			<option value="activateLeftTabSkipSpecial">switch to left tab (skip special pages)</option>
+			<option value="activateRightTab">switch to right tab</option>
+			<option value="activateRightTabSkipSpecial">switch to right tab (skip special pages)</option>
+			<option value="undoCloseTab">restore last closed tab</option>`
 	}
 
-	rightEnabledCheckbox.onchange = async function (event) {
-		await extensionStorage.set({ "rightEnabled": event.target.checked });
+	const getElementById = (id) => document.getElementById(id);
+
+	for (optionName in options) {
+		if (optionName.endsWith('Enabled')) {
+			getElementById(optionName).checked = options[optionName];
+		} else if (optionName.endsWith('Action') || optionName === 'minDelta') {
+			getElementById(optionName).value = options[optionName];
+		}
 	}
 
-	upEnabledCheckbox.onchange = async function (event) {
-		await extensionStorage.set({ "upEnabled": event.target.checked });
+	getElementById('minDelta-display-value').textContent = options.minDelta + "px";
+
+	for (const checkboxElement of document.querySelectorAll('input[type="checkbox"]')) {
+		checkboxElement.onchange = async function (event) {
+			options[event.target.id] = event.target.checked;
+			await setOptions(options);
+		}
 	}
 
-	downEnabledCheckbox.onchange = async function (event) {
-		await extensionStorage.set({ "downEnabled": event.target.checked });
+	for (const selectElement of document.querySelectorAll('select')) {
+		selectElement.onchange = async function (event) {
+			options[event.target.id] = event.target.value;
+			await setOptions(options);
+		}
 	}
 
-	async function onMinDeltaInputChanged(event) {
-		minDeltaDisplay.textContent = minDeltaInput.value + "px";
-		await extensionStorage.set({ "minDelta": event.target.valueAsNumber });
+	getElementById('minDelta').oninput = (event) => {
+		getElementById('minDelta-display-value').textContent = event.target.value + "px";
 	}
 
-	minDeltaInput.onchange = onMinDeltaInputChanged;
-	minDeltaInput.oninput = onMinDeltaInputChanged;
+	getElementById('minDelta').onchange = async (event) => {
+		options.minDelta = event.target.value;
+		await setOptions(options);
+	}
 }
-
-window.onload = init;
-
