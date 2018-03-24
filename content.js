@@ -1,4 +1,5 @@
 let options;
+let platformInfo;
 
 init();
 
@@ -19,6 +20,8 @@ async function init() {
 			options = message.data;
 		}
 	});
+
+	platformInfo = await sendRequest('getPlatformInfo');
 
 	// Add mousedown event handler
 	window.addEventListener('mousedown', onMouseDown, true);
@@ -158,17 +161,19 @@ function onMouseDown(mouseDownEvent) {
 let lastKeyPressed = -1;
 let ctrlKeyPressed = false;
 
-function onKeyDown(event) {
+async function onKeyDown(event) {
 	lastKeyPressed = event.keyCode;
 
 	if (event.key == "Control") {
 		ctrlKeyPressed = true;
+		await sendRequest("setCtrlKeyState", true);
 	}
 }
 
-function onKeyUp(event) {
+async function onKeyUp(event) {
 	if (event.key == "Control") {
 		ctrlKeyPressed = false;
+		await sendRequest("setCtrlKeyState", false);
 	}
 }
 
@@ -196,9 +201,17 @@ function detectOrphanContextMenu(event) {
 }
 
 async function handleGesture(gesture) {
+	let ctrlPressed;
+
+	if (platformInfo.os == 'win') {
+		ctrlPressed = ctrlKeyPressed;
+	} else {
+		ctrlPressed = await sendRequest('getCtrlKeyState');
+	}
+
 	switch (gesture) {
 		case "left":
-			if (ctrlKeyPressed) {
+			if (ctrlPressed) {
 				if (options.ctrlLeftEnabled) {
 					await executeAction(options.ctrlLeftAction);
 				}
@@ -210,7 +223,7 @@ async function handleGesture(gesture) {
 			break;
 
 		case "right":
-			if (ctrlKeyPressed) {
+			if (ctrlPressed) {
 				if (options.ctrlRightEnabled) {
 					await executeAction(options.ctrlRightAction);
 				}
@@ -223,7 +236,7 @@ async function handleGesture(gesture) {
 			break;
 
 		case "up":
-			if (ctrlKeyPressed) {
+			if (ctrlPressed) {
 				if (options.ctrlUpEnabled) {
 					await executeAction(options.ctrlUpAction);
 				}
@@ -235,7 +248,7 @@ async function handleGesture(gesture) {
 			break;
 
 		case "down":
-			if (ctrlKeyPressed) {
+			if (ctrlPressed) {
 				if (options.ctrlDownEnabled) {
 					await executeAction(options.ctrlDownAction);
 				}

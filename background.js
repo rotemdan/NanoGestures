@@ -1,4 +1,5 @@
 init();
+let platformInfo;
 
 async function init() {
 	//await extensionStorage.clear();
@@ -11,9 +12,16 @@ async function init() {
 	// Ensure options are initialized
 	await getOptions();
 
+	// Cache platform info
+	platformInfo = await browser.runtime.getPlatformInfo();
+
 	// Add message listener
 	browser.runtime.onMessage.addListener(onMessage);
+
+
 }
+
+let ctrlKeyDown = false;
 
 async function onMessage(message, sender) {
 	switch (message.type) {
@@ -123,6 +131,20 @@ async function onMessage(message, sender) {
 
 			return;
 		}
+
+		case "getCtrlKeyState": {
+			return ctrlKeyDown;
+		}
+
+		case "setCtrlKeyState": {
+			ctrlKeyDown = message.data;
+			return;
+		}
+
+		case "getPlatformInfo": {
+			return platformInfo;
+		}
+
 	}
 }
 
