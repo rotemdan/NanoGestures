@@ -174,7 +174,7 @@ function onKeyUp(event) {
 
 // Ensure that if the Ctrl key was release outside of any tracked pages, its state would
 // default to off when focus returns. If it is still pressed when focus returned it should yield
-// continuous keyup events.
+// continuous keydown events.
 function onWindowFocused(event) {
 	ctrlKeyPressed = false
 }
