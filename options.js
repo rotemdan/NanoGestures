@@ -9,13 +9,13 @@ async function init() {
 			<option value="navigateBack">navigate back</option>
 			<option value="navigateForward">navigate forward</option>
 			<option value="reload">reload current page</option>
+			<option value="createNewTab">create a new tab</option>
 			<option value="closeCurrentTab">close current tab</option>
-			<option value="createNewTab">create new tab</option>
+			<option value="undoCloseTab">restore last closed tab</option>
 			<option value="activateLeftTab">switch to left tab</option>
 			<option value="activateLeftTabSkipSpecial">switch to left tab (skip special pages)</option>
 			<option value="activateRightTab">switch to right tab</option>
-			<option value="activateRightTabSkipSpecial">switch to right tab (skip special pages)</option>
-			<option value="undoCloseTab">restore last closed tab</option>`
+			<option value="activateRightTabSkipSpecial">switch to right tab (skip special pages)</option>`
 	}
 
 	const getElementById = (id) => document.getElementById(id);
