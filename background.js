@@ -1,7 +1,7 @@
 init();
 
 async function init() {
-	await extensionStorage.clear();
+	//await extensionStorage.clear();
 
 	// Ensure relevant browser settings are set
 	if (browser.browserSettings && browser.browserSettings.contextMenuShowEvent) {
