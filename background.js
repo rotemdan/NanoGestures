@@ -148,8 +148,6 @@ async function getOptions() {
 		ctrlUpAction: 'undoCloseTab',
 		ctrlDownAction: 'closeCurrentTab',
 
-		skipTabsWithSpecialPages: false,
-
 		minDelta: 4
 	}
 
