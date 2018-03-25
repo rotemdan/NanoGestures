@@ -7,7 +7,7 @@ This is a minimalistic mouse gesture WebExtension supporting four basic gestures
 3. Hold right mouse button + drag up
 4. Hold right mouse button + drag down
 
-The gestures can also be modified by the `ctrl` key (or `cmd` key on Mac), yielding a total of 8 distinct possible actions.
+The gestures can also be modified by the `ctrl` key, yielding a total of 8 distinct possible actions.
 
 Gesture assignment is fully configurable. The following actions are currently supported:
 
@@ -25,7 +25,7 @@ Gesture assignment is fully configurable. The following actions are currently su
 # Installation
 
 * **Chrome**: [Chrome Web Store](https://chrome.google.com/webstore/detail/jmiagganalpdjkbgmmhjmpckacldiegp).
-* **Firefox** (58+): [Mozilla Addon Repository](https://addons.mozilla.org/en-US/firefox/addon/nano-gestures/).
+* **Firefox** (58+): [Mozilla add-on Repository](https://addons.mozilla.org/en-US/firefox/addon/nano-gestures/).
 
 
 
