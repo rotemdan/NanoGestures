@@ -17,8 +17,6 @@ async function init() {
 
 	// Add message listener
 	browser.runtime.onMessage.addListener(onMessage);
-
-
 }
 
 let ctrlKeyDown = false;
@@ -71,7 +69,7 @@ async function onMessage(message, sender) {
 							break;
 						}
 
-						if (message.data.skipTabsWithSpecialPages && !/^http(s):\/\//.test(leftTabInfo.url)) {
+						if (message.data.skipTabsWithSpecialPages && !/^https?:\/\//.test(leftTabInfo.url)) {
 							continue;
 						}
 
@@ -99,7 +97,7 @@ async function onMessage(message, sender) {
 							break;
 						}
 
-						if (message.data.skipTabsWithSpecialPages && !/^http(s):\/\//.test(rightTabInfo.url)) {
+						if (message.data.skipTabsWithSpecialPages && !/^https?:\/\//.test(rightTabInfo.url)) {
 							continue;
 						}
 
@@ -199,7 +197,7 @@ async function broadcastMessageToContentScripts(message) {
 	const tabs = await browser.tabs.query({ windowType: "normal" });
 
 	for (tab of tabs) {
-		if (/^http(s):\/\//.test(tab.url)) {
+		if (/^https?:\/\//.test(tab.url)) {
 			browser.tabs.sendMessage(tab.id, message);
 		}
 	}
