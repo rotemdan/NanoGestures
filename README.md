@@ -7,7 +7,8 @@ This is a minimalistic mouse gesture WebExtension supporting four basic gestures
 3. Hold right mouse button + drag up
 4. Hold right mouse button + drag down
 
-The gestures can also be modified by the `ctrl` key, yielding a total of 8 distinct possible actions.
+
+The gestures can also be modified by the `ctrl` key, yielding a maximum of 8 distinct possible assignable actions.
 
 Gesture assignment is fully configurable. The following actions are currently supported:
 
