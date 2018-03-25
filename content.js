@@ -1,5 +1,4 @@
 let options;
-let platformInfo;
 
 init();
 
@@ -20,8 +19,6 @@ async function init() {
 			options = message.data;
 		}
 	});
-
-	platformInfo = await sendRequest('getPlatformInfo');
 
 	// Add mousedown event handler
 	window.addEventListener('mousedown', onMouseDown, true);
@@ -95,15 +92,15 @@ function onMouseDown(mouseDownEvent) {
 
 			if (deltaYToXRatio <= 1) {
 				if (options.leftEnabled && deltaX < minDelta * -1) {
-					await handleGesture('left');
+					await handleGesture('left', event.ctrlKey);
 				} else if (options.rightEnabled && deltaX >= minDelta) {
-					await handleGesture('right');
+					await handleGesture('right', event.ctrlKey);
 				}
 			} else {
 				if (options.upEnabled && deltaY < minDelta * -1) {
-					await handleGesture('up');
+					await handleGesture('up', event.ctrlKey);
 				} else if (options.downEnabled && deltaY >= minDelta) {
-					await handleGesture('down');
+					await handleGesture('down', event.ctrlKey);
 				}
 			}
 		} else if (contextMenuTriggeredBeforeMouseUp) {
@@ -159,29 +156,9 @@ function onMouseDown(mouseDownEvent) {
 }
 
 let lastKeyPressed = -1;
-let ctrlKeyPressed = false;
 
 async function onKeyDown(event) {
 	lastKeyPressed = event.keyCode;
-
-	if (event.key == "Control") {
-		ctrlKeyPressed = true;
-		await sendRequest("setCtrlKeyState", true);
-	}
-}
-
-async function onKeyUp(event) {
-	if (event.key == "Control") {
-		ctrlKeyPressed = false;
-		await sendRequest("setCtrlKeyState", false);
-	}
-}
-
-// Ensure that if the Ctrl key was release outside of any tracked pages, its state would
-// default to off when focus returns. If it is still pressed when focus returned it should yield
-// continuous keydown events.
-function onWindowFocused(event) {
-	ctrlKeyPressed = false
 }
 
 // Event handler to detect context menu not originating from a right click sequence
@@ -200,18 +177,10 @@ function detectOrphanContextMenu(event) {
 	}
 }
 
-async function handleGesture(gesture) {
-	let ctrlPressed;
-
-	if (platformInfo.os == 'win') {
-		ctrlPressed = ctrlKeyPressed;
-	} else {
-		ctrlPressed = await sendRequest('getCtrlKeyState');
-	}
-
+async function handleGesture(gesture, ctrlKeyPressed) {
 	switch (gesture) {
 		case "left":
-			if (ctrlPressed) {
+			if (ctrlKeyPressed) {
 				if (options.ctrlLeftEnabled) {
 					await executeAction(options.ctrlLeftAction);
 				}
@@ -223,7 +192,7 @@ async function handleGesture(gesture) {
 			break;
 
 		case "right":
-			if (ctrlPressed) {
+			if (ctrlKeyPressed) {
 				if (options.ctrlRightEnabled) {
 					await executeAction(options.ctrlRightAction);
 				}
@@ -236,7 +205,7 @@ async function handleGesture(gesture) {
 			break;
 
 		case "up":
-			if (ctrlPressed) {
+			if (ctrlKeyPressed) {
 				if (options.ctrlUpEnabled) {
 					await executeAction(options.ctrlUpAction);
 				}
@@ -248,7 +217,7 @@ async function handleGesture(gesture) {
 			break;
 
 		case "down":
-			if (ctrlPressed) {
+			if (ctrlKeyPressed) {
 				if (options.ctrlDownEnabled) {
 					await executeAction(options.ctrlDownAction);
 				}

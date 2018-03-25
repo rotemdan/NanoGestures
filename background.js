@@ -19,8 +19,6 @@ async function init() {
 	browser.runtime.onMessage.addListener(onMessage);
 }
 
-let ctrlKeyDown = false;
-
 async function onMessage(message, sender) {
 	switch (message.type) {
 		case "getOptions": {
@@ -130,19 +128,9 @@ async function onMessage(message, sender) {
 			return;
 		}
 
-		case "getCtrlKeyState": {
-			return ctrlKeyDown;
-		}
-
-		case "setCtrlKeyState": {
-			ctrlKeyDown = message.data;
-			return;
-		}
-
 		case "getPlatformInfo": {
 			return platformInfo;
 		}
-
 	}
 }
 
