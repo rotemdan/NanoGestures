@@ -29,10 +29,6 @@ async function init() {
 
 	// Add handler to track modifier key states and menu key presses
 	window.addEventListener('keydown', onKeyDown, true);
-	window.addEventListener('keyup', onKeyUp, true);
-
-	// Add handler to reset modifier key states when window is focused
-	window.addEventListener("focus", onWindowFocused, true);
 }
 
 let withinARightClickSequence = false;
