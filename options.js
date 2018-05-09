@@ -30,16 +30,32 @@ async function init() {
 
 	getElementById('minDelta-display-value').textContent = options.minDelta + "px";
 
+	function updateActivationForCheckboxElement(checkboxElement) {
+		if (checkboxElement.classList.contains('enableGestureCheckbox')) {
+			const selectElement = document.querySelector(`label[for="${checkboxElement.id}"] select`);
+
+			if (selectElement) {
+				selectElement.disabled = !checkboxElement.checked;
+			}
+		}
+	}
+
 	for (const checkboxElement of document.querySelectorAll('input[type="checkbox"]')) {
 		checkboxElement.onchange = async function (event) {
-			options[event.target.id] = event.target.checked;
+			const targetElement = event.target;
+			updateActivationForCheckboxElement(targetElement);
+			options[targetElement.id] = targetElement.checked;
 			await setOptions(options);
+
 		}
+
+		updateActivationForCheckboxElement(checkboxElement);
 	}
 
 	for (const selectElement of document.querySelectorAll('select')) {
 		selectElement.onchange = async function (event) {
-			options[event.target.id] = event.target.value;
+			const targetElement = event.target;
+			options[targetElement.id] = targetElement.value;
 			await setOptions(options);
 		}
 	}
