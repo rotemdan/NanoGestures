@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Nano Gestures",
-	"version": "0.3.5",
+	"version": "0.3.6",
 	"description": "Adds four basic mouse gestures for browser navigation.",
 	"icons": {
 		"48": "icons/icon-48.png",
@@ -32,7 +32,8 @@
 		}
 	],
 	"options_ui": {
-		"page": "options.html"
+		"page": "options.html",
+		"open_in_tab": true
 	},
 	"permissions": [
 		"storage",
