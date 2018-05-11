@@ -67,7 +67,7 @@ async function onMessage(message, sender) {
 							break;
 						}
 
-						if (message.data.skipTabsWithSpecialPages && !/^https?:\/\//.test(leftTabInfo.url)) {
+						if (message.data.skipTabsWithSpecialPages && isSpecialPageURL(leftTabInfo.url)) {
 							continue;
 						}
 
@@ -95,7 +95,7 @@ async function onMessage(message, sender) {
 							break;
 						}
 
-						if (message.data.skipTabsWithSpecialPages && !/^https?:\/\//.test(rightTabInfo.url)) {
+						if (message.data.skipTabsWithSpecialPages && isSpecialPageURL(rightTabInfo.url)) {
 							continue;
 						}
 
@@ -189,4 +189,16 @@ async function broadcastMessageToContentScripts(message) {
 			browser.tabs.sendMessage(tab.id, message);
 		}
 	}
+}
+
+function isSpecialPageURL(url) {
+	if (!/^https?:\/\//.test(url)) {
+		return true;
+	} else if (navigator.userAgent.indexOf("Firefox") >= 0 && (/^https?:\/\/addons\.mozilla\.org/.test(url) || /^https?:\/\/testpilot\.firefox\.com/.test(url))) {
+		return true;
+	} else if (navigator.userAgent.indexOf("Chrome") >= 0 && /^https?:\/\/chrome\.google\.com\/webstore\//.test(url)) {
+		return true;
+	}
+
+	return false;
 }
