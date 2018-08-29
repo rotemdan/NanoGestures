@@ -15,7 +15,7 @@ async function init() {
 
 	// Listen to option updates
 	browser.runtime.onMessage.addListener((message, sender) => {
-		if (message.type = 'optionsUpdated') {
+		if (message.type === 'optionsUpdated') {
 			options = message.data;
 		}
 	});
